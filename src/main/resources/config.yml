@@ -1,57 +1,50 @@
-# Cback 插件設定檔
+# ============================================================
+#  CoreTP 全域設定
+#  各傳送功能的設定在 modules/ 資料夾（tpa、home、warp、back、rtp 各一個檔案）
+#  所有顯示文字在 messages.yml
+# ============================================================
 
-prefix: "&8[&6Cback&8] "
-teleport-delay-seconds: 5
-cancel-teleport-on-move: true
-cancel-teleport-on-damage: true
-save-cooldown-ms: 1000
-min-distance: 3.0
-record-death: true
+storage:
+  # 資料多久批次寫入硬碟一次（秒）。玩家離線與關服時一定會存檔。
+  save-interval-seconds: 60
 
-allowed-causes:
-  - COMMAND
-  - PLUGIN
-  - NETHER_PORTAL
-  - END_PORTAL
-  - SPECTATE
+safety:
+  # 傳送到家、地標、歷史位置前，檢查落點是否會窒息或掉進岩漿
+  check-destination: true
 
-messages:
-  no-permission: "&c&l錯誤 &8- &7您沒有執行此指令的權限！"
-  no-location: "&c&l提示 &8- &7找不到您的歷史位置紀錄！"
-  teleporting: "&a&l傳送 &8- &7正在為您傳送回歷史位置，請稍候..."
-  teleport-fail: "&c&l失敗 &8- &7傳送失敗，可能目標區域未載入或安全檢查未通過。"
-  reload-success: "&a&l系統 &8- &7設定檔與歷史資料已重新載入完成！"
-  only-players: "&c&l錯誤 &8- &7此指令只能由玩家在遊戲內執行！"
+countdown:
+  # 傳送倒數顯示在快捷欄上方（true）或聊天室（false）
+  actionbar: true
 
-  teleporting-already: "&c&l提示 &8- &7您已在傳送倒數中，請稍候！"
-  teleport-countdown: "&a&l傳送 &8- &7將在 &e%d &a秒後進行傳送，請勿移動或受到傷害..."
-  teleport-cancelled: "&c&l取消 &8- &7您移動了或受到傷害，傳送已取消！"
+update-checker:
+  # 伺服器啟動時檢查 GitHub 是否有新版本
+  check-on-startup: true
+  # 有新版本時，提醒具備 coretp.version 權限的玩家（登入 3 秒後）
+  notify-on-join: true
 
-  arrival-title: "&a&l傳送成功"
-  arrival-subtitle: "&7已抵達 世界: &f%s &8| &7座標: &eX:%s Y:%s Z:%s"
-
-  help-header: "&8&m===================&r &6&lCback &8&m==================="
-  help-back: "&e/back &7- 快速傳送回上一次的位置 (傳送或死亡點)"
-  help-cback: "&e/cback &7- 傳送回上一次的位置"
-  help-eback: "&e/eback &7- 開啟傳送歷史選單 (支援雙端 UI)"
-  help-reload: "&e/cback reload &7- 重新載入設定檔與歷史資料"
-  help-footer: "&8&m============================================="
-
-  gui-title: "&6&l傳送歷史選單 &7(Eback)"
-  gui-death-name: "&c&l第 %d 筆 - 死亡點"
-  gui-teleport-name: "&a&l第 %d 筆 - 傳送點"
-  gui-type-death: "&c&l死亡點"
-  gui-type-teleport: "&a&l傳送點"
-  gui-lore:
-    - "&8&m---------------------------------"
-    - "&7類型: {type}"
-    - "&7世界: &f{world}"
-    - "&7座標: &eX:{x} &7| &eY:{y} &7| &eZ:{z}"
-    - "&7時間: &b{time}"
-    - "&8&m---------------------------------"
-    - "&e點擊以傳送至此位置"
-
-  bedrock-title: "傳送歷史選單 (Eback)"
-  bedrock-content: "請點擊下方按鈕以傳送到指定的歷史位置："
-  bedrock-button-death: "[死亡點] 第 %d 筆\n世界: %s | 時間: %s\n座標: X:%s Y:%s Z:%s"
-  bedrock-button-teleport: "[傳送點] 第 %d 筆\n世界: %s | 時間: %s\n座標: X:%s Y:%s Z:%s"
+gui:
+  # 箱子介面的填充物品
+  filler: GRAY_STAINED_GLASS_PANE
+  icons:
+    homes: RED_BED
+    public-homes: LIME_BED
+    warps: BEACON
+    players: PLAYER_HEAD
+    requests: WRITABLE_BOOK
+    back: RECOVERY_COMPASS
+    rtp: ENDER_PEARL
+    home-private: RED_BED
+    home-public: LIME_BED
+    warp-default: LODESTONE
+    back-teleport: COMPASS
+    back-death: SKELETON_SKULL
+    teleport: ENDER_PEARL
+    toggle-public: OAK_DOOR
+    delete: BARRIER
+    confirm: LIME_CONCRETE
+    cancel: RED_CONCRETE
+    tpa: ENDER_PEARL
+    tpahere: ENDER_EYE
+    previous: ARROW
+    next: ARROW
+    back-button: OAK_SIGN

@@ -1,0 +1,40 @@
+# CoreTP - 玩家互傳（/tpa、/tpahere、/tpaccept、/tpdeny、/tpcancel、/tptoggle）
+# 費用由發出請求的人支付。
+
+# 是否啟用此功能
+enabled: true
+
+# 停用的世界。玩家所在的世界或目的地的世界只要有一方在清單內就不傳送。
+# 範例：
+# disabled-worlds:
+#   - world_nether
+disabled-worlds: []
+
+# 傳送前等待秒數（0 = 立即傳送）
+warmup-seconds: 3
+# 等待期間移動（換了一格）就取消
+cancel-on-move: true
+# 等待期間受傷就取消
+cancel-on-damage: true
+# 成功傳送後的冷卻秒數（0 = 無冷卻）
+cooldown-seconds: 0
+
+# 收費（需要 Vault 與經濟插件；沒有安裝時一律免費）
+# 兩種方式可以分別開關，都關閉就是免費。
+cost:
+  # 同一個世界內：基本費 + 每格單價 x 距離，再限制在最低與最高之間
+  distance:
+    enabled: false
+    base: 0.0
+    per-block: 0.01
+    min: 0.0
+    max: 1000.0
+  # 跨世界：固定費用
+  cross-world:
+    enabled: false
+    price: 100.0
+
+# 同一位玩家兩次發送請求之間至少要間隔幾秒（防止洗頻，0 = 不限制）
+request-interval-seconds: 5
+# 請求多久沒回應就自動失效（秒）
+request-timeout-seconds: 60

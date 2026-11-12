@@ -1,156 +1,241 @@
-# Cback
+# CoreTP
 
-Cback 是一個基於 Paper 平台開發的玩家位置返回 (`/back`) 插件，支援多世界環境並整合 Floodgate API 提供 Java 版與基岩版雙端原生介面。
+CoreTP 是一個 Paper 26.x 的整合式傳送插件，把玩家互傳（TPA）、家、地標、返回與隨機傳送放在同一個插件裡。每個功能都有自己的設定檔，可以單獨開關、設定等待時間、冷卻、停用的世界與收費方式。Java 版玩家使用箱子介面，基岩版（Floodgate）玩家使用原生表單。
+
+CoreTP 是 [Cback](https://github.com/clre20/CoreTP/releases/tag/v2.0.1) 的後繼版本，第一次啟動時會自動匯入 Cback 的歷史位置。
+
+## 功能特色
+
+- **玩家互傳**：`/tpa`、`/tpahere`，請求會自動過期，聊天室有可點擊的 [接受] [拒絕] 按鈕
+  - 每位玩家同時只能送出一個請求
+  - `/tptoggle` 可以關閉接收請求
+- **家**：可設定多個家，數量上限用權限節點分級（`coretp.home.limit.<數量>`）
+  - 玩家可以在選單裡把每個家設為「公開」或「私人」
+  - 公開的家會出現在公開清單，擁有者離線時其他玩家也能前往
+- **地標**：由管理員建立，可指定選單圖示；預設只有管理員可以使用
+- **返回**：記錄傳送前的位置與死亡點，每位玩家保留最近 10 筆（可調整）
+  - `/back` 回到最近一筆，`/eback` 開啟歷史清單
+  - 內建時間間隔與最小距離過濾，避免基岩版延遲或防作弊拉回蓋掉真正的位置
+- **隨機傳送**：在玩家目前所在的世界內尋找安全落點，各世界可設定不同範圍
+- **每個功能獨立設定**（`modules/tpa.yml`、`home.yml`、`warp.yml`、`back.yml`、`rtp.yml`）
+  - 等待秒數、移動或受傷是否取消、冷卻秒數
+  - 停用的世界：出發地或目的地任一方在清單內就不傳送
+  - 收費：依距離、跨世界固定費用，兩者可分別開關，都關閉就是免費（需要 Vault）
+- **雙端介面**：Java 版箱子介面（只接受左鍵），基岩版原生表單
+- **效能**：資料只在記憶體讀寫，定時批次寫入 SQLite；區塊一律非同步載入
+- **自動補齊設定**：更新版本後缺少的設定與訊息會自動補上，原有的值不會被改掉
+- **更新檢查**：啟動時與 `/coretp version` 向 GitHub Releases 檢查新版本
+
+## 指令與權限
+
+| 指令 | 執行者 | 權限節點 | 預設 |
+| :--- | :--- | :--- | :--- |
+| `/coretp` | 玩家 | `coretp.use` | 所有人 |
+| `/coretp help` | 玩家／後台 | `coretp.use` | 所有人 |
+| `/coretp reload` | 玩家／後台 | `coretp.reload` | 管理員 |
+| `/coretp version` | 玩家／後台 | `coretp.version` | 管理員 |
+| `/tpa <玩家>` | 玩家 | `coretp.tpa` | 所有人 |
+| `/tpahere <玩家>` | 玩家 | `coretp.tpahere` | 所有人 |
+| `/tpaccept [玩家]`、`/tpdeny [玩家]` | 玩家 | `coretp.tpa.respond` | 所有人 |
+| `/tpcancel` | 玩家 | `coretp.tpa` 或 `coretp.tpahere` | 所有人 |
+| `/tptoggle` | 玩家 | `coretp.tptoggle` | 所有人 |
+| `/home [名稱]`、`/homes` | 玩家 | `coretp.home` | 所有人 |
+| `/homes public` | 玩家 | `coretp.home.visit` | 所有人 |
+| `/sethome [名稱]` | 玩家 | `coretp.home.set` | 所有人 |
+| `/delhome <名稱>` | 玩家 | `coretp.home.delete` | 所有人 |
+| （選單內切換公開／私人） | 玩家 | `coretp.home.public` | 所有人 |
+| `/warp <名稱>`、`/warps` | 玩家 | `coretp.warp` | 管理員 |
+| `/setwarp <名稱> [圖示]` | 玩家 | `coretp.warp.set` | 管理員 |
+| `/delwarp <名稱>` | 玩家／後台 | `coretp.warp.delete` | 管理員 |
+| `/back` | 玩家 | `coretp.back` | 所有人 |
+| `/eback` | 玩家 | `coretp.back.history` | 所有人 |
+| `/rtp` | 玩家 | `coretp.rtp` | 所有人 |
+
+> `/ctp` 是 `/coretp` 的別名。
+
+> 家的數量：`coretp.home.limit.<數量>`（例如 `coretp.home.limit.10`），沒有時使用 `home.yml` 的 `default-limit`。
+
+> 略過限制的權限預設沒有人擁有（包含管理員），需要時請另外給予：`coretp.bypass.warmup`（不用等待）、`coretp.bypass.cooldown`（沒有冷卻）、`coretp.bypass.cost`（不收費）、`coretp.bypass.toggle`（可對關閉請求的玩家發送）。
+
+## 使用範例
+
+### 1. 把地標開放給所有玩家
+
+地標預設只有管理員可以使用。要讓玩家也能傳送，用權限插件給予 `coretp.warp`：
+
+```bash
+/setwarp spawn BEACON
+/lp group default permission set coretp.warp true
+```
+
+### 2. 設定隨機傳送收費並停用地獄
+
+編輯 `plugins/CoreTP/modules/rtp.yml`：
+
+```yaml
+disabled-worlds:
+  - world_nether
+cost:
+  distance:
+    enabled: true
+    base: 10.0
+    per-block: 0.01
+    min: 10.0
+    max: 100.0
+```
+
+存檔後執行：
+
+```bash
+/ctp reload
+```
+
+- 收費需要安裝 Vault 與任何一個經濟插件
+- 玩家身在 `world_nether` 時無法使用 `/rtp`
+
+### 3. 從 Cback 升級
+
+1. 關閉伺服器
+2. 移除 Cback 的 jar，放入 CoreTP 的 jar（`plugins/Cback/` 資料夾留著）
+3. 啟動伺服器
+
+CoreTP 會匯入歷史位置，把整個 `Cback` 資料夾壓縮成 `plugins/CoreTP/Cback-backup-<時間>.zip`，確認備份完成後才刪除原資料夾。
+
+- 如果 Cback 的 jar 還在，CoreTP 會暫停所有功能並提示先移除 Cback
+- 舊的自訂訊息不會搬移，請到 `messages.yml` 重新調整
+
+## 可自訂訊息
+
+所有文字都在 `plugins/CoreTP/messages.yml`，使用 `&` 顏色代碼，`{大括號}` 是變數。
+
+| 區段 | 說明 |
+| :--- | :--- |
+| `general` | 前綴、沒有權限、功能未開啟、重載完成等共用訊息 |
+| `help` | `/coretp help` 顯示的說明 |
+| `teleport` | 等待倒數、取消、冷卻、餘額不足、世界停用等傳送流程訊息 |
+| `tpa`、`home`、`warp`、`back`、`rtp` | 各功能的訊息 |
+| `update` | 更新檢查結果 |
+| `gui` | 箱子介面的標題、物品名稱與說明 |
+| `form` | 基岩版表單的文字 |
 
 ---
 
-### 概述
+# CoreTP
 
-Cback 提供玩家在發生傳送事件或死亡後返回先前位置的功能。針對 Geyser / Floodgate 跨平台架構進行底層優化，修正基岩版網路延遲與伺服器端防作弊拉回導致座標被錯誤覆蓋的問題。此外，插件提供 `/eback` 歷史紀錄選單，會依據客戶端來源自動派發 Java 箱子介面或基岩版原生表單。
+CoreTP is an all-in-one teleport plugin for Paper 26.x: player-to-player requests (TPA), homes, warps, back, and random teleport. Every feature has its own config file, so each one can be switched on or off and given its own warmup, cooldown, disabled worlds, and pricing. Java players get chest menus; Bedrock (Floodgate) players get native forms.
 
-### 功能架構
+CoreTP is the successor to [Cback](https://github.com/clre20/CoreTP/releases/tag/v2.0.1) and imports Cback's location history on first start.
 
-- **雙端介面適配**
-  - 自動偵測客戶端連線協議。
-  - Java 版：調用標準箱子容器介面。
-  - 基岩版：透過 Floodgate 與 Cumulus API 調用客戶端原生按鈕表單。
-- **座標防抖動與校驗機制**
-  - **時間間隔限制 (`save-cooldown-ms`)**：設定最短儲存冷卻時間，過濾密集封包與短期連續位移。
-  - **最小距離判定 (`min-distance`)**：同世界內小於指定距離的位移不予記錄，防止防作弊插件拉回修正時覆蓋真實傳送點。
-- **歷史位置佇列**
-  - 每個玩家最多保留 10 筆歷史座標。
-  - 記錄項目包含觸發類型（傳送點 / 死亡點）、所屬世界、X/Y/Z 座標以及時間戳記。
-- **傳送等待與中斷防護**
-  - 支援傳送倒數計時。
-  - 倒數期間可配置是否在玩家移動或受到傷害時中斷傳送。
-- **效能與儲存**
-  - 全面採用 Paper 異步傳送 API (`teleportAsync`)，降低跨世界或未載入區塊傳送對伺服器主執行緒的負載。
-  - 玩家歷史紀錄採 UUID 獨立 YAML 檔案持久化儲存。
-  - 設定檔具備缺漏鍵自動補齊功能，更新版本時保留現有客製化參數。
+## Features
 
-### 指令列表
+- **TPA**: `/tpa` and `/tpahere` with expiring requests and clickable [Accept] [Deny] chat buttons
+  - One outgoing request per player
+  - `/tptoggle` to stop receiving requests
+- **Homes**: multiple homes, limit set by permission (`coretp.home.limit.<number>`)
+  - Each home can be switched between public and private from the menu
+  - Public homes are listed for everyone and work while the owner is offline
+- **Warps**: created by admins, with a custom menu icon; admin-only by default
+- **Back**: records the location before a teleport and on death, last 10 per player (configurable)
+  - `/back` returns to the latest entry, `/eback` opens the history
+  - Time and distance filters stop Bedrock lag or anti-cheat setbacks from overwriting real locations
+- **Random teleport**: finds a safe spot in the player's current world, with per-world ranges
+- **Per-feature config** (`modules/tpa.yml`, `home.yml`, `warp.yml`, `back.yml`, `rtp.yml`)
+  - Warmup, cancel on move or damage, cooldown
+  - Disabled worlds: the teleport is refused if either the origin or the destination is listed
+  - Pricing: by distance and a flat cross-world fee, each switchable; both off means free (needs Vault)
+- **Two interfaces**: chest menus for Java (left click only), native forms for Bedrock
+- **Performance**: data is read and written in memory and batch-saved to SQLite; chunks load asynchronously
+- **Config auto-fill**: missing settings and messages are added after an update, existing values are kept
+- **Update check**: on startup and with `/coretp version`, against GitHub Releases
 
-| 指令 | 參數 | 預設權限 | 說明 |
+## Commands and Permissions
+
+| Command | Executor | Permission | Default |
 | :--- | :--- | :--- | :--- |
-| `/back` | 無 | 所有人 (`true`) | 返回上一次記錄的位置（傳送點或死亡點） |
-| `/cback` | 無 | 所有人 (`true`) | 主要指令，功能同 `/back` |
-| `/cback` | `reload` | 管理員 (`op`) | 重新載入設定檔與玩家歷史資料 |
-| `/eback` | 無 | 所有人 (`true`) | 開啟歷史位置清單介面 |
+| `/coretp` | Player | `coretp.use` | Everyone |
+| `/coretp help` | Player / Console | `coretp.use` | Everyone |
+| `/coretp reload` | Player / Console | `coretp.reload` | Operator |
+| `/coretp version` | Player / Console | `coretp.version` | Operator |
+| `/tpa <player>` | Player | `coretp.tpa` | Everyone |
+| `/tpahere <player>` | Player | `coretp.tpahere` | Everyone |
+| `/tpaccept [player]`, `/tpdeny [player]` | Player | `coretp.tpa.respond` | Everyone |
+| `/tpcancel` | Player | `coretp.tpa` or `coretp.tpahere` | Everyone |
+| `/tptoggle` | Player | `coretp.tptoggle` | Everyone |
+| `/home [name]`, `/homes` | Player | `coretp.home` | Everyone |
+| `/homes public` | Player | `coretp.home.visit` | Everyone |
+| `/sethome [name]` | Player | `coretp.home.set` | Everyone |
+| `/delhome <name>` | Player | `coretp.home.delete` | Everyone |
+| (public / private switch in the menu) | Player | `coretp.home.public` | Everyone |
+| `/warp <name>`, `/warps` | Player | `coretp.warp` | Operator |
+| `/setwarp <name> [icon]` | Player | `coretp.warp.set` | Operator |
+| `/delwarp <name>` | Player / Console | `coretp.warp.delete` | Operator |
+| `/back` | Player | `coretp.back` | Everyone |
+| `/eback` | Player | `coretp.back.history` | Everyone |
+| `/rtp` | Player | `coretp.rtp` | Everyone |
 
-### 權限節點
+> `/ctp` is an alias of `/coretp`.
 
-| 權限節點 | 預設指派 | 說明 |
-| :--- | :--- | :--- |
-| `cback.use` | 所有人 (`true`) | 允許執行 `/back`、`/cback` 及 `/eback` 指令 |
-| `cback.admin` | 管理員 (`op`) | 允許執行 `/cback reload` 指令 |
+> Home limit: `coretp.home.limit.<number>` (for example `coretp.home.limit.10`); without it, `default-limit` in `home.yml` applies.
 
-### 設定檔說明 (`config.yml`)
+> Bypass permissions are granted to nobody by default, operators included: `coretp.bypass.warmup`, `coretp.bypass.cooldown`, `coretp.bypass.cost`, `coretp.bypass.toggle`.
 
-```yaml
-# 系統訊息前綴
-prefix: "&8[&6Cback&8] "
+## Usage Examples
 
-# 傳送等待時間（秒）。設為 0 則立即傳送
-teleport-delay-seconds: 5
+### 1. Open warps to every player
 
-# 傳送倒數期間移動是否取消傳送
-cancel-teleport-on-move: true
+Warps are admin-only by default. Grant `coretp.warp` with your permission plugin:
 
-# 傳送倒數期間受傷是否取消傳送
-cancel-teleport-on-damage: true
-
-# 儲存座標的最短冷卻時間（毫秒）
-# 用於過濾 Geyser 封包延遲或防作弊回彈
-save-cooldown-ms: 1000
-
-# 同世界內觸發記錄的最小位移距離（格）
-# 小於此距離的傳送事件將被忽略
-min-distance: 3.0
-
-# 是否記錄玩家死亡位置
-record-death: true
-
-# 允許觸發記錄的傳送類型
-allowed-causes:
-  - COMMAND
-  - PLUGIN
-  - NETHER_PORTAL
-  - END_PORTAL
-  - SPECTATE
+```bash
+/setwarp spawn BEACON
+/lp group default permission set coretp.warp true
 ```
 
----
+### 2. Charge for random teleport and disable it in the Nether
 
-### Overview
-
-Cback is a Paper-based teleportation callback (`/back`) plugin designed to restore a player's previous location after teleportation or death. It addresses cross-platform coordinate desynchronization in Geyser / Floodgate environments, specifically mitigating packet latency issues and anti-cheat rubberbanding. The plugin also features an `/eback` menu that dynamically renders either a chest GUI or a native Bedrock form based on the client's platform.
-
-### Technical Features
-
-- **Platform-Aware UI Dispatching**
-  - Determines client type at runtime.
-  - Java Edition: Dispatches standard container inventory interface.
-  - Bedrock Edition: Uses Floodgate and Cumulus APIs to render native button forms.
-- **Position Filtering and Validation**
-  - **Cooldown Threshold (`save-cooldown-ms`)**: Enforces a minimum interval between location writes to drop redundant or delayed packets.
-  - **Distance Threshold (`min-distance`)**: Ignores positional changes within the same world that do not exceed the specified block distance, preventing anti-cheat setbacks from overriding valid coordinates.
-- **Location History Queue**
-  - Maintains a fixed-size queue of up to 10 entries per player.
-  - Stores location metadata including event cause (teleport / death), world identifier, XYZ coordinates, and UNIX timestamps.
-- **Warmup and Cancellation Handling**
-  - Configurable teleport countdown.
-  - Event listeners monitor player movement and damage during warmup to cancel pending teleports when configured.
-- **Performance and Storage**
-  - Uses Paper's `teleportAsync` API to prevent main-thread hangs during cross-world or unloaded-chunk teleports.
-  - Persists player location data into individual YAML files indexed by player UUID.
-  - Automatically merges new configuration entries on startup while preserving existing values.
-
-### Commands
-
-| Command | Arguments | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `/back` | None | Everyone (`true`) | Teleports to the most recent location (teleport or death) |
-| `/cback` | None | Everyone (`true`) | Primary command; aliases `/back` |
-| `/cback` | `reload` | Operator (`op`) | Reloads `config.yml` and re-reads player data |
-| `/eback` | None | Everyone (`true`) | Opens the location history interface |
-
-### Permissions
-
-| Permission | Default | Description |
-| :--- | :--- | :--- |
-| `cback.use` | Everyone (`true`) | Grants access to `/back`, `/cback`, and `/eback` |
-| `cback.admin` | Operator (`op`) | Grants access to `/cback reload` |
-
-### Configuration Reference (`config.yml`)
+Edit `plugins/CoreTP/modules/rtp.yml`:
 
 ```yaml
-# Chat and console log prefix
-prefix: "&8[&6Cback&8] "
-
-# Warmup delay in seconds. Set to 0 for instant execution
-teleport-delay-seconds: 5
-
-# Cancel teleport if the player moves during countdown
-cancel-teleport-on-move: true
-
-# Cancel teleport if the player takes damage during countdown
-cancel-teleport-on-damage: true
-
-# Minimum time (in milliseconds) required between saves
-# Filters out rapid duplicate position updates or anti-cheat rubberbanding
-save-cooldown-ms: 1000
-
-# Minimum block distance within the same world required to record a new position
-min-distance: 3.0
-
-# Whether to record death coordinates
-record-death: true
-
-# Teleport causes that trigger position recording (PlayerTeleportEvent.TeleportCause)
-allowed-causes:
-  - COMMAND
-  - PLUGIN
-  - NETHER_PORTAL
-  - END_PORTAL
-  - SPECTATE
+disabled-worlds:
+  - world_nether
+cost:
+  distance:
+    enabled: true
+    base: 10.0
+    per-block: 0.01
+    min: 10.0
+    max: 100.0
 ```
+
+Then run:
+
+```bash
+/ctp reload
+```
+
+- Pricing needs Vault and an economy plugin
+- Players standing in `world_nether` cannot use `/rtp`
+
+### 3. Upgrade from Cback
+
+1. Stop the server
+2. Remove the Cback jar and add the CoreTP jar (keep the `plugins/Cback/` folder)
+3. Start the server
+
+CoreTP imports the location history, zips the whole `Cback` folder to `plugins/CoreTP/Cback-backup-<time>.zip`, and deletes the original folder only after the backup is verified.
+
+- If the Cback jar is still installed, CoreTP pauses every feature and asks you to remove Cback first
+- Old custom messages are not carried over; adjust them in `messages.yml`
+
+## Configurable Messages
+
+All text lives in `plugins/CoreTP/messages.yml`, using `&` colour codes; `{braces}` are variables.
+
+| Section | Description |
+| :--- | :--- |
+| `general` | Prefix, no permission, feature disabled, reload done, and other shared messages |
+| `help` | The text shown by `/coretp help` |
+| `teleport` | Countdown, cancellation, cooldown, not enough money, disabled world |
+| `tpa`, `home`, `warp`, `back`, `rtp` | Messages for each feature |
+| `update` | Update check results |
+| `gui` | Chest menu titles, item names, and lore |
+| `form` | Bedrock form text |

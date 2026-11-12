@@ -1,26 +1,162 @@
-name: Cback
-description: 記錄玩家傳送前位置的 /back 插件，完美相容 Geyser 用戶與 Multiverse-Core，提供歷史 GUI/Bedrock UI。
-version: '${project.version}'
-main: clre20.cback.Cback
-api-version: '1.21'
+name: CoreTP
+description: 整合式傳送插件：玩家互傳、家、地標、返回與隨機傳送，支援箱子介面與基岩版表單。
+prefix: CoreTP
+version: '${version}'
+
+main: clre20.coreTP.CoreTP
+api-version: '26.1.1'
 load: POSTWORLD
+softdepend: [ Vault, floodgate ]
+website: https://github.com/clre20/CoreTP
+
 authors: [ Clre20 ]
 
 commands:
-  cback:
-    description: Cback 主指令，用於返回上一次的位置或重新載入設定。
-    permission: cback.use
+  coretp:
+    description: 開啟傳送選單，或使用 help、reload、version。
+    aliases: [ ctp ]
+    usage: /<command> [help|reload|version]
+  tpa:
+    description: 請求傳送到其他玩家身邊。
+    usage: /<command> <玩家>
+    permission: coretp.tpa
+  tpahere:
+    description: 請求其他玩家傳送到您身邊。
+    usage: /<command> <玩家>
+    permission: coretp.tpahere
+  tpaccept:
+    description: 接受傳送請求。
+    usage: /<command> [玩家]
+    permission: coretp.tpa.respond
+  tpdeny:
+    description: 拒絕傳送請求。
+    usage: /<command> [玩家]
+    permission: coretp.tpa.respond
+  tpcancel:
+    description: 取消您送出的傳送請求。
+    usage: /<command>
+  tptoggle:
+    description: 開關是否接收傳送請求。
+    usage: /<command>
+    permission: coretp.tptoggle
+  home:
+    description: 傳送到家。
+    usage: /<command> [名稱]
+    permission: coretp.home
+  sethome:
+    description: 把目前位置設為家。
+    usage: /<command> [名稱]
+    permission: coretp.home.set
+  delhome:
+    description: 刪除家。
+    usage: /<command> <名稱>
+    permission: coretp.home.delete
+  homes:
+    description: 開啟家的選單。
+    usage: /<command> [public]
+  warp:
+    description: 傳送到地標。
+    usage: /<command> <名稱>
+    permission: coretp.warp
+  setwarp:
+    description: 建立或更新地標。
+    usage: /<command> <名稱> [圖示物品]
+    permission: coretp.warp.set
+  delwarp:
+    description: 刪除地標。
+    usage: /<command> <名稱>
+    permission: coretp.warp.delete
+  warps:
+    description: 開啟地標選單。
+    usage: /<command>
+    permission: coretp.warp
   back:
-    description: 快捷指令，用於傳送回上一次的位置。
-    permission: cback.use
+    description: 返回上一個位置。
+    usage: /<command>
+    permission: coretp.back
   eback:
-    description: 開啟傳送歷史選單 (支援 Java 介面與 Bedrock 專用表單)。
-    permission: cback.use
+    description: 開啟歷史位置選單。
+    usage: /<command>
+    permission: coretp.back.history
+  rtp:
+    description: 在目前的世界隨機傳送。
+    usage: /<command>
+    permission: coretp.rtp
 
 permissions:
-  cback.use:
-    description: 允許玩家傳送回上一次位置及開啟歷史選單的權限
+  coretp.use:
+    description: 開啟傳送選單與查看說明
     default: true
-  cback.admin:
-    description: 允許管理員重新載入插件設定與資料的權限
+  coretp.tpa:
+    description: 使用 /tpa 與 /tpcancel
+    default: true
+  coretp.tpahere:
+    description: 使用 /tpahere
+    default: true
+  coretp.tpa.respond:
+    description: 使用 /tpaccept 與 /tpdeny
+    default: true
+  coretp.tptoggle:
+    description: 使用 /tptoggle
+    default: true
+  coretp.home:
+    description: 使用 /home 與 /homes
+    default: true
+  coretp.home.set:
+    description: 使用 /sethome
+    default: true
+  coretp.home.delete:
+    description: 使用 /delhome
+    default: true
+  coretp.home.public:
+    description: 把自己的家設為公開或私人
+    default: true
+  coretp.home.visit:
+    description: 前往其他玩家公開的家
+    default: true
+  coretp.warp:
+    description: 使用 /warp 與 /warps
     default: op
+  coretp.warp.set:
+    description: 使用 /setwarp
+    default: op
+  coretp.warp.delete:
+    description: 使用 /delwarp
+    default: op
+  coretp.back:
+    description: 使用 /back
+    default: true
+  coretp.back.history:
+    description: 使用 /eback
+    default: true
+  coretp.rtp:
+    description: 使用 /rtp
+    default: true
+  coretp.reload:
+    description: 使用 /coretp reload
+    default: op
+  coretp.version:
+    description: 使用 /coretp version 並在登入時收到更新提醒
+    default: op
+  coretp.bypass.warmup:
+    description: 傳送不需要等待
+    default: false
+  coretp.bypass.cooldown:
+    description: 傳送沒有冷卻
+    default: false
+  coretp.bypass.cost:
+    description: 傳送不收費
+    default: false
+  coretp.bypass.toggle:
+    description: 可以對關閉接收請求的玩家發送請求
+    default: false
+  coretp.admin:
+    description: 包含所有管理權限
+    default: op
+    children:
+      coretp.use: true
+      coretp.warp: true
+      coretp.warp.set: true
+      coretp.warp.delete: true
+      coretp.reload: true
+      coretp.version: true

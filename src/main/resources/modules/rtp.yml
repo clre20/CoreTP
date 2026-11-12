@@ -1,0 +1,55 @@
+# CoreTP - 隨機傳送（/rtp）
+# 在玩家目前所在的世界內隨機傳送。
+
+# 是否啟用此功能
+enabled: true
+
+# 停用的世界。玩家所在的世界或目的地的世界只要有一方在清單內就不傳送。
+# 範例：
+# disabled-worlds:
+#   - world_nether
+disabled-worlds: []
+
+# 傳送前等待秒數（0 = 立即傳送）
+warmup-seconds: 3
+# 等待期間移動（換了一格）就取消
+cancel-on-move: true
+# 等待期間受傷就取消
+cancel-on-damage: true
+# 成功傳送後的冷卻秒數（0 = 無冷卻）
+cooldown-seconds: 60
+
+# 收費（需要 Vault 與經濟插件；沒有安裝時一律免費）
+# 兩種方式可以分別開關，都關閉就是免費。
+cost:
+  # 同一個世界內：基本費 + 每格單價 x 距離，再限制在最低與最高之間
+  distance:
+    enabled: false
+    base: 0.0
+    per-block: 0.01
+    min: 0.0
+    max: 1000.0
+  # 跨世界：固定費用
+  cross-world:
+    enabled: false
+    price: 100.0
+
+# 每次最多嘗試幾個位置
+max-attempts: 12
+# 全伺服器同時可以有幾個人在搜尋位置（避免大量產生區塊造成卡頓）
+max-concurrent: 2
+
+# 各世界的範圍。沒有列出的世界使用 default。
+# 範例：
+# worlds:
+#   world_nether:
+#     center-x: 0
+#     center-z: 0
+#     min-radius: 100
+#     max-radius: 1000
+worlds:
+  default:
+    center-x: 0
+    center-z: 0
+    min-radius: 500
+    max-radius: 5000

@@ -1,0 +1,52 @@
+# CoreTP - 返回（/back、/eback）
+
+# 是否啟用此功能
+enabled: true
+
+# 停用的世界。玩家所在的世界或目的地的世界只要有一方在清單內就不傳送。
+# 範例：
+# disabled-worlds:
+#   - world_nether
+disabled-worlds: []
+
+# 傳送前等待秒數（0 = 立即傳送）
+warmup-seconds: 5
+# 等待期間移動（換了一格）就取消
+cancel-on-move: true
+# 等待期間受傷就取消
+cancel-on-damage: true
+# 成功傳送後的冷卻秒數（0 = 無冷卻）
+cooldown-seconds: 0
+
+# 收費（需要 Vault 與經濟插件；沒有安裝時一律免費）
+# 兩種方式可以分別開關，都關閉就是免費。
+cost:
+  # 同一個世界內：基本費 + 每格單價 x 距離，再限制在最低與最高之間
+  distance:
+    enabled: false
+    base: 0.0
+    per-block: 0.01
+    min: 0.0
+    max: 1000.0
+  # 跨世界：固定費用
+  cross-world:
+    enabled: false
+    price: 100.0
+
+# 每位玩家保留幾筆歷史位置（1 ~ 45）
+max-history: 10
+# 超過幾天的歷史位置自動刪除（0 = 不刪除）
+history-expire-days: 30
+# 兩次記錄之間的最短間隔（毫秒），用來過濾基岩版延遲或防作弊拉回
+save-cooldown-ms: 1000
+# 同一個世界內，距離上一筆記錄小於這個格數就不記錄
+min-distance: 3.0
+# 是否記錄死亡位置
+record-death: true
+# 哪些傳送原因會被記錄
+allowed-causes:
+  - COMMAND
+  - PLUGIN
+  - NETHER_PORTAL
+  - END_PORTAL
+  - SPECTATE
