@@ -1,0 +1,256 @@
+# ============================================================
+#  CoreTP 訊息設定
+#  顏色使用 & 代碼（例如 &a 綠色、&l 粗體）。
+#  {大括號} 是變數，會被替換成實際內容，請保留。
+#  把某一則訊息設成 "" 就不會顯示。
+# ============================================================
+
+general:
+  prefix: "&8[&bCoreTP&8] "
+  no-permission: "&c您沒有權限執行這個動作。"
+  only-players: "&c這個指令只能由玩家在遊戲內使用。"
+  module-disabled: "&c這個功能目前沒有開啟。"
+  data-not-loaded: "&c您的資料尚未載入完成，請稍後再試。"
+  data-load-failed: "&cCoreTP 無法載入您的資料，請稍後重新登入。"
+  player-not-found: "&c找不到玩家 &f{player}&c。"
+  invalid-name: "&c名稱只能使用文字、數字、底線與減號，長度 1 ~ {max} 個字。"
+  reloaded: "&a設定檔與訊息已重新載入。"
+  blocked: "&c偵測到舊插件 Cback 仍然安裝中，CoreTP 已暫停所有功能。請移除 Cback 的 jar 檔後重新啟動伺服器。"
+  time-format: "MM/dd HH:mm"
+  world-unloaded: "&c目的地所在的世界目前沒有載入。"
+
+help:
+  header: "&8&m----------&r &b&lCoreTP &7v{version} &8&m----------"
+  lines:
+    - "&e/ctp &7- 開啟傳送選單"
+    - "&e/tpa <玩家> &7- 請求傳送到對方身邊"
+    - "&e/tpahere <玩家> &7- 請求對方傳送到您身邊"
+    - "&e/tpaccept [玩家] &7- 接受傳送請求"
+    - "&e/tpdeny [玩家] &7- 拒絕傳送請求"
+    - "&e/tpcancel &7- 取消您送出的請求"
+    - "&e/tptoggle &7- 開關是否接收傳送請求"
+    - "&e/home [名稱] &7- 傳送到家"
+    - "&e/sethome [名稱] &7- 把目前位置設為家"
+    - "&e/delhome <名稱> &7- 刪除家"
+    - "&e/homes [public] &7- 開啟家的選單（public 為公開的家）"
+    - "&e/warp <名稱> &7- 傳送到地標"
+    - "&e/warps &7- 開啟地標選單"
+    - "&e/back &7- 返回上一個位置"
+    - "&e/eback &7- 開啟歷史位置選單"
+    - "&e/rtp &7- 在目前的世界隨機傳送"
+  admin-lines:
+    - "&e/setwarp <名稱> [圖示] &7- 建立或更新地標"
+    - "&e/delwarp <名稱> &7- 刪除地標"
+    - "&e/ctp reload &7- 重新載入設定"
+    - "&e/ctp version &7- 檢查更新"
+
+teleport:
+  already: "&c您已經在傳送中，請稍候。"
+  world-disabled-from: "&c您所在的世界不能使用這個功能。"
+  world-disabled-to: "&c目的地所在的世界不能使用這個功能。"
+  cooldown: "&c冷卻中，還要等 &e{seconds} &c秒。"
+  not-enough-money: "&c餘額不足，需要 &e{cost}&c，您只有 &e{balance}&c。"
+  warmup-start: "&7將在 &e{seconds} &7秒後傳送，請不要移動或受到傷害。"
+  countdown: "&a傳送倒數 &e{seconds} &a秒"
+  cancelled-move: "&c您移動了，傳送已取消。"
+  cancelled-damage: "&c您受到傷害，傳送已取消。"
+  cancelled: "&c傳送已取消。"
+  unsafe: "&c目的地不安全（可能會窒息或掉進岩漿），傳送已取消。"
+  failed: "&c傳送失敗，請稍後再試。"
+  success: "&a傳送完成。"
+  charged: "&7已支付 &e{cost}&7。"
+  payer-offline: "&c付費的玩家已離線，傳送已取消。"
+
+tpa:
+  self: "&c不能對自己發送請求。"
+  toggled-off: "&f{player} &c目前不接收傳送請求。"
+  too-fast: "&c發送請求太頻繁，請等 &e{seconds} &c秒。"
+  pending-exists: "&c您已經有一個等待中的請求，請先用 &e/tpcancel &c取消。"
+  sent: "&a已向 &f{player} &a發送傳送請求，{seconds} 秒內有效。"
+  sent-here: "&a已請求 &f{player} &a傳送到您身邊，{seconds} 秒內有效。"
+  received: "&f{player} &e想要傳送到您身邊。"
+  received-here: "&f{player} &e想請您傳送到他身邊。"
+  buttons: "{accept} &8| {deny}"
+  button-accept: "&a&l[接受]"
+  button-deny: "&c&l[拒絕]"
+  button-accept-hover: "&a點擊接受 &f{player} &a的請求"
+  button-deny-hover: "&c點擊拒絕 &f{player} &c的請求"
+  no-request: "&c目前沒有等待中的傳送請求。"
+  no-request-from: "&c沒有來自 &f{player} &c的傳送請求。"
+  accepted: "&a已接受 &f{player} &a的請求。"
+  accepted-notify: "&f{player} &a接受了您的請求。"
+  denied: "&7已拒絕 &f{player} &7的請求。"
+  denied-notify: "&f{player} &c拒絕了您的請求。"
+  cancelled: "&7已取消發送給 &f{player} &7的請求。"
+  cancelled-notify: "&f{player} &7取消了傳送請求。"
+  nothing-to-cancel: "&c您沒有等待中的請求。"
+  expired: "&7發送給 &f{player} &7的請求已過期。"
+  expired-notify: "&7來自 &f{player} &7的請求已過期。"
+  target-offline: "&c對方已經離線，傳送已取消。"
+  toggle-on: "&a您現在會接收傳送請求。"
+  toggle-off: "&e您現在不會接收傳送請求。"
+
+home:
+  set: "&a已將目前位置設為家 &f{name}&a。"
+  updated: "&a已更新家 &f{name} &a的位置。"
+  limit: "&c您最多只能設定 &e{limit} &c個家。"
+  not-found: "&c找不到名為 &f{name} &c的家。"
+  none: "&c您還沒有設定任何家，請使用 &e/sethome&c。"
+  deleted: "&7已刪除家 &f{name}&7。"
+  now-public: "&a家 &f{name} &a現在是公開的，其他玩家可以前往。"
+  now-private: "&e家 &f{name} &e現在是私人的。"
+  public-gone: "&c這個公開的家已經不存在或改為私人。"
+  world-disabled: "&c這個世界不能設定家。"
+  state-public: "&a公開"
+  state-private: "&c私人"
+
+warp:
+  set: "&a已建立地標 &f{name}&a。"
+  updated: "&a已更新地標 &f{name} &a的位置。"
+  deleted: "&7已刪除地標 &f{name}&7。"
+  not-found: "&c找不到名為 &f{name} &c的地標。"
+  invalid-icon: "&c找不到物品 &f{icon}&c，請使用物品 ID（例如 DIAMOND）。"
+  set-usage: "&c用法：&e/setwarp <名稱> [圖示物品]"
+  delete-usage: "&c用法：&e/delwarp <名稱>"
+
+back:
+  none: "&c找不到您的歷史位置。"
+  type-teleport: "&a傳送點"
+  type-death: "&c死亡點"
+
+rtp:
+  busy: "&c目前有太多人在使用隨機傳送，請稍後再試。"
+  no-safe-location: "&c找不到安全的位置，請再試一次。"
+  searching: "&7正在尋找安全的位置…"
+
+update:
+  checking: "&7正在檢查更新…"
+  up-to-date: "&a目前是最新版本 &f{current}&a。"
+  outdated: "&e有新版本 &f{latest}&e（目前 &f{current}&e）。下載：&bhttps://github.com/clre20/CoreTP/releases"
+  ahead: "&b目前版本 &f{current} &b比 GitHub 的 &f{latest} &b新（開發版）。"
+  failed: "&c無法檢查更新，請稍後再試。"
+
+migration:
+  start: "偵測到 Cback 資料夾，開始匯入舊資料…"
+  imported: "已匯入 {players} 位玩家、共 {entries} 筆歷史位置。"
+  zipped: "已將 Cback 資料夾備份為 {file}。"
+  deleted: "已刪除舊的 Cback 資料夾。"
+  failed: "Cback 資料遷移失敗，舊資料夾已保留：{reason}"
+
+gui:
+  previous: "&e上一頁"
+  next: "&e下一頁"
+  back-button: "&e返回"
+  close: "&c關閉"
+  page-lore:
+    - "&7第 {page} / {pages} 頁"
+  main:
+    title: "&8CoreTP 傳送選單"
+    homes: "&a我的家"
+    homes-lore:
+      - "&7查看並前往您設定的家"
+      - "&7目前 &f{count} &7/ &f{limit} &7個"
+    public-homes: "&a公開的家"
+    public-homes-lore:
+      - "&7前往其他玩家公開的家"
+    warps: "&b地標"
+    warps-lore:
+      - "&7前往伺服器地標"
+    players: "&e傳送到玩家"
+    players-lore:
+      - "&7選擇一位玩家發送傳送請求"
+    requests: "&6傳送請求"
+    requests-lore:
+      - "&7等待您回應的請求：&f{count}"
+    back: "&d歷史位置"
+    back-lore:
+      - "&7回到之前的位置或死亡點"
+    rtp: "&5隨機傳送"
+    rtp-lore:
+      - "&7在目前的世界隨機傳送"
+  homes:
+    title: "&8我的家"
+    item: "&a{name}"
+    item-lore:
+      - "&7狀態：{state}"
+      - "&7世界：&f{world}"
+      - "&7座標：&e{x}&7, &e{y}&7, &e{z}"
+      - ""
+      - "&e點擊開啟選項"
+  home-detail:
+    title: "&8家：{name}"
+    teleport: "&a傳送到這個家"
+    make-public: "&a改為公開"
+    make-public-lore:
+      - "&7公開後其他玩家可以前往"
+    make-private: "&e改為私人"
+    make-private-lore:
+      - "&7改為私人後只有您可以前往"
+    delete: "&c刪除這個家"
+  home-delete:
+    title: "&8確定刪除 {name}？"
+    confirm: "&a確定刪除"
+    cancel: "&c取消"
+  public-homes:
+    title: "&8公開的家"
+    item: "&a{name}"
+    item-lore:
+      - "&7擁有者：&f{owner}"
+      - "&7世界：&f{world}"
+      - "&7座標：&e{x}&7, &e{y}&7, &e{z}"
+      - ""
+      - "&e點擊傳送"
+  warps:
+    title: "&8地標"
+    item: "&b{name}"
+    item-lore:
+      - "&7世界：&f{world}"
+      - "&7座標：&e{x}&7, &e{y}&7, &e{z}"
+      - ""
+      - "&e點擊傳送"
+  players:
+    title: "&8選擇玩家"
+    item: "&e{player}"
+    item-lore:
+      - "&e點擊選擇傳送方式"
+  tpa-type:
+    title: "&8傳送請求：{player}"
+    tpa: "&a我傳送到對方身邊"
+    tpahere: "&b請對方傳送到我身邊"
+  requests:
+    title: "&8傳送請求"
+    item: "&e{player}"
+    item-lore-tpa:
+      - "&7想要傳送到您身邊"
+      - ""
+      - "&e點擊回應"
+    item-lore-here:
+      - "&7想請您傳送到他身邊"
+      - ""
+      - "&e點擊回應"
+  request-confirm:
+    title: "&8回應 {player} 的請求"
+    accept: "&a接受"
+    deny: "&c拒絕"
+  back:
+    title: "&8歷史位置"
+    item: "&f第 {index} 筆 &8- {type}"
+    item-lore:
+      - "&7世界：&f{world}"
+      - "&7座標：&e{x}&7, &e{y}&7, &e{z}"
+      - "&7時間：&b{time}"
+      - ""
+      - "&e點擊傳送"
+
+# 基岩版（Floodgate）玩家看到的表單文字
+form:
+  content: "請選擇："
+  empty: "目前沒有任何項目。"
+  back: "返回"
+  home: "{name}（{state}&r）"
+  public-home: "{name}\n擁有者：{owner}"
+  warp: "{name}\n{world} {x}, {y}, {z}"
+  player: "{player}"
+  request-tpa: "{player}\n想要傳送到您身邊"
+  request-here: "{player}\n想請您傳送到他身邊"
+  back-entry: "第 {index} 筆 - {type}&r\n{world} {x}, {y}, {z}（{time}）"
