@@ -4,6 +4,9 @@ CoreTP 是一個 Paper 26.x 的整合式傳送插件，把玩家互傳（TPA）�
 
 CoreTP 是 [Cback](https://github.com/clre20/CoreTP/releases/tag/v2.0.1) 的後繼版本，第一次啟動時會自動匯入 Cback 的歷史位置。
 
+
+> **版本檢查提示**：若伺服器有安裝 [HttpHub](https://github.com/clre20/HttpHub)，本插件自動由 HttpHub 集中處理版本檢查與管理員登入通知，避免各插件自開連線與背景執行緒。
+
 ## 功能特色
 
 - **玩家互傳**：`/tpa`、`/tpahere`，請求會自動過期，聊天室有可點擊的 [接受] [拒絕] 按鈕
@@ -121,6 +124,9 @@ CoreTP 會匯入歷史位置，把整個 `Cback` 資料夾壓縮成 `plugins/Cor
 ---
 
 # CoreTP
+
+
+> **Update Checker**: When [HttpHub](https://github.com/clre20/HttpHub) is installed, update checks and operator login alerts are handled centrally by HttpHub via virtual threads, preventing redundant background connections.
 
 CoreTP is an all-in-one teleport plugin for Paper 26.x: player-to-player requests (TPA), homes, warps, back, and random teleport. Every feature has its own config file, so each one can be switched on or off and given its own warmup, cooldown, disabled worlds, and pricing. Java players get chest menus; Bedrock (Floodgate) players get native forms.
 

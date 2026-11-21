@@ -73,15 +73,25 @@ public final class UpdateChecker {
     }
 
     private Result fetch() {
-        try (HttpClient client = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(5)).build()) {
-            HttpRequest request = HttpRequest.newBuilder(URI.create(api))
-                    .timeout(Duration.ofSeconds(8))
-                    .header("Accept", "application/vnd.github+json")
-                    .header("User-Agent", "CoreTP/" + current)
-                    .GET().build();
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            String body = response.body();
-            if (response.statusCode() != 200 || body == null || body.length() > MAX_BODY) {
+        try {
+            String body;
+            if (clre20.httpHub.api.HttpHubAPI.isAvailable()) {
+                body = clre20.httpHub.api.HttpHubAPI.getStringAsync(plugin, api).get(10, java.util.concurrent.TimeUnit.SECONDS);
+            } else {
+                try (HttpClient client = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(5)).build()) {
+                    HttpRequest request = HttpRequest.newBuilder(URI.create(api))
+                            .timeout(Duration.ofSeconds(8))
+                            .header("Accept", "application/vnd.github+json")
+                            .header("User-Agent", "CoreTP/" + current)
+                            .GET().build();
+                    HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+                    if (response.statusCode() != 200) {
+                        return new Result(Status.FAILED, "", System.currentTimeMillis());
+                    }
+                    body = response.body();
+                }
+            }
+            if (body == null || body.length() > MAX_BODY) {
                 return new Result(Status.FAILED, "", System.currentTimeMillis());
             }
             JsonElement root = JsonParser.parseString(body);

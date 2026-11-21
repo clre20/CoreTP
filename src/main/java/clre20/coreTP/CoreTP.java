@@ -102,7 +102,9 @@ public final class CoreTP extends JavaPlugin {
         // 每 5 分鐘清一次過期的冷卻紀錄
         Bukkit.getScheduler().runTaskTimer(this, teleports::pruneCooldowns, 6000L, 6000L);
 
-        if (settings.updateCheckOnStartup) {
+        if (clre20.httpHub.api.HttpHubAPI.isAvailable()) {
+            clre20.httpHub.api.HttpHubAPI.registerUpdateCheck(this, "clre20/CoreTP", getPluginMeta().getVersion(), "coretp.version", null);
+        } else if (settings.updateCheckOnStartup) {
             updates.logOnStartup();
         }
         running = true;

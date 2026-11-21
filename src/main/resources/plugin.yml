@@ -6,7 +6,7 @@ version: '${version}'
 main: clre20.coreTP.CoreTP
 api-version: '26.1.1'
 load: POSTWORLD
-softdepend: [ Vault, floodgate ]
+softdepend: [ Vault, floodgate, HttpHub ]
 website: https://github.com/clre20/CoreTP
 
 authors: [ Clre20 ]
